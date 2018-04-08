@@ -2,13 +2,13 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title><%= Package.name %></title>
+<title><%= @package[:full_name] %></title>
 </head>
 <body>
   <section>
     <ul>
-      <% @vars['movies'].each do |movie| %>
-        <li><%= movie %></li>
+      <% @movies.each do |movie| %>
+        <li><a href="<%= movie %>"><%= movie %></a></li>
       <% end %>
     </ul>
   </section>
