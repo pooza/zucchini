@@ -4,6 +4,7 @@ require 'active_support/core_ext'
 require 'zucchini/config'
 require 'zucchini/package'
 require 'streamio-ffmpeg'
+require 'digest/sha1'
 
 class File
   def self.binary_size (path)
@@ -47,12 +48,30 @@ module Zucchini
       @config['application']['suffixes'].each do |suffix|
         Dir.glob(File.join(ROOT_DIR, "public/movie/*#{suffix}")).each do |f|
           next if (params['q'].present? && !File.basename(f).include?(params['q']))
+
           movie = FFMPEG::Movie.new(f)
+          digest = Digest::SHA1.hexdigest(File.read(f))
+          thumbnail_path = File.join(
+            ROOT_DIR,
+            'public/thumbnail/',
+            "#{digest}.png",
+          )
+          pixel = @config['local']['thumbnail']['pixel'] || 200
+
+          unless File.exist?(thumbnail_path)
+            movie.screenshot(
+              thumbnail_path,
+              {resolution: "#{pixel}x#{pixel}"},
+              preserve_aspect_ratio: :width,
+            )
+          end
+
           @movies.push({
             binary_size: File.binary_size(f),
             size: File.size(f),
             name: File.basename(f),
             href: f.sub(File.join(ROOT_DIR, 'public'), ''),
+            thumbnail_href: File.join('/thumbnail', "#{digest}.png"),
             path: f,
             width: movie.width,
             height: movie.height,
