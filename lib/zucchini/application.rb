@@ -3,11 +3,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'zucchini/slack'
 require 'zucchini/config'
-require 'zucchini/xml'
 require 'zucchini/html'
-require 'zucchini/atom/toei'
-require 'zucchini/atom/abc'
-require 'zucchini/atom/garden'
 require 'zucchini/package'
 require 'zucchini/logger'
 
@@ -33,7 +29,7 @@ module Zucchini
 
     before do
       @message = {request:{path: request.path, params:params}, response:{}}
-      @renderer = XML.new
+      @renderer = HTML.new
     end
 
     after do
@@ -49,49 +45,33 @@ module Zucchini
 
     ['/', '/index'].each do |route|
       get route do
-        @renderer = HTML.new
         @renderer.template_file = 'index.erb'
-        return @renderer.to_s
-      end
-    end
-
-    get '/mechokku' do
-      @renderer.status = 302
-      redirect @config['application']['external_urls']['mechokku']
-    end
-
-    get '/about' do
-      @message[:response][:message] = Package.full_name
-      @renderer.message = @message
-      return @renderer.to_s
-    end
-
-    get '/feed/v1.0/site/:site' do
-      begin
-        @renderer = "Zucchini::#{params[:site].capitalize}Atom".constantize.new
-        return @renderer.to_s
-      rescue NameError => e
-        @renderer = XML.new
-        @renderer.status = 404
-        @message[:response][:message] = "#{params[:site].capitalize}Atom not found."
-        @renderer.message = @message
+        movies = []
+        @config['local']['dirs'].each do |dir|
+          @config['application']['suffixes'].each do |suffix|
+            Dir.glob(File.join(dir, "*#{suffix}")).each do |f|
+              movies.push(f)
+            end
+          end
+        end
+        @renderer.vars['movies'] = movies
         return @renderer.to_s
       end
     end
 
     not_found do
-      @renderer = XML.new
       @renderer.status = 404
       @message[:response][:message] = "Resource #{@message[:request][:path]} not found."
-      @renderer.message = @message
+      @renderer.template_file = 'not_found.erb'
+      @renderer.vars[:message] = @message
       return @renderer.to_s
     end
 
     error do
-      @renderer = XML.new
       @renderer.status = 500
       @message[:response][:message] = env['sinatra.error'].message
-      @renderer.message = @message
+      @renderer.template_file = 'error.erb'
+      @renderer.vars[:message] = @message
       @slack.say(@message) if @slack
       return @renderer.to_s
     end

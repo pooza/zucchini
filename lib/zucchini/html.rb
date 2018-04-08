@@ -1,8 +1,15 @@
 require 'erb'
+require 'zucchini/renderer'
 
 module Zucchini
   class HTML < Renderer
     attr :template_file, true
+    attr :vars
+
+    def initialize
+      super
+      @vars = {}
+    end
 
     def type
       return 'text/html; charset=UTF-8'
