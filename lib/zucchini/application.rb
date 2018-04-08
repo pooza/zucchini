@@ -12,15 +12,26 @@ class File
     ['', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'].each do |unit|
       unitsize = 1024 ** i
       if size < (unitsize * 1024 * 2)
-        return "#{(size / unitsize).floor}#{unit}"
+        return "#{(size / unitsize).floor.commaize}#{unit}"
       end
       i += 1
     end
   end
 end
 
+class Integer
+  def commaize
+    return self.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+  end
+end
+
 module Zucchini
   class Application < Sinatra::Base
+    helpers do
+      include Rack::Utils
+      alias_method :h, :escape_html
+    end
+
     set :public, File.join(ROOT_DIR, 'public')
     set :views, File.join(ROOT_DIR, 'views')
 
@@ -38,7 +49,8 @@ module Zucchini
           next if (params['q'].present? && !File.basename(f).include?(params['q']))
           movie = FFMPEG::Movie.new(f)
           @movies.push({
-            size: File.binary_size(f),
+            binary_size: File.binary_size(f),
+            size: File.size(f),
             name: File.basename(f),
             href: f.sub(File.join(ROOT_DIR, 'public'), ''),
             path: f,

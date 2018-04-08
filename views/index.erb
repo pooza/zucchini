@@ -6,19 +6,19 @@
 </head>
 <body>
   <form>
-    <input type="search" name="q" value="<%= @params['q'] %>" placeholder="検索">
+    <input type="search" name="q" value="<%= h @params['q'] %>">
     <input type="submit" value="検索">
   </form>
   <section>
     <ul>
       <% @movies.each do |movie| %>
         <li>
-          <a href="<%= movie[:href] %>"><%= movie[:name] %></a><br>
-          path: <%= movie[:path] %><br>
-          size: <%= movie[:size] %><br>
-          width: <%= movie[:width] %>px<br>
-          height: <%= movie[:height] %>px<br>
-          duration: <%= '%0.2fsec'%[movie[:duration]] %><br>
+          <a href="<%= movie[:href] %>"><%= h movie[:name] %></a><br>
+          path: <%= h movie[:path] %><br>
+          size: <%= h movie[:binary_size] %> (<%= h movie[:size].commaize %>b)<br>
+          width: <%= h movie[:width].commaize %>px<br>
+          height: <%= h movie[:height].commaize %>px<br>
+          duration: <%= h '%0.2fsec.'%[movie[:duration]] %><br>
         </li>
       <% end %>
     </ul>
