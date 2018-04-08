@@ -5,10 +5,21 @@
 <title><%= @package[:full_name] %></title>
 </head>
 <body>
+  <form>
+    <input type="search" name="q" value="<%= @params['q'] %>" placeholder="検索">
+    <input type="submit" value="検索">
+  </form>
   <section>
     <ul>
       <% @movies.each do |movie| %>
-        <li><a href="<%= movie %>"><%= movie %></a></li>
+        <li>
+          <a href="<%= movie[:href] %>"><%= movie[:name] %></a><br>
+          path: <%= movie[:path] %><br>
+          size: <%= movie[:size] %><br>
+          width: <%= movie[:width] %>px<br>
+          height: <%= movie[:height] %>px<br>
+          duration: <%= '%0.2fsec'%[movie[:duration]] %><br>
+        </li>
       <% end %>
     </ul>
   </section>

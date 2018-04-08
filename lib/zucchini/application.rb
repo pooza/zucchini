@@ -3,6 +3,21 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'zucchini/config'
 require 'zucchini/package'
+require 'streamio-ffmpeg'
+
+class File
+  def self.binary_size (path)
+    size = File.size(path)
+    i = 0
+    ['', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'].each do |unit|
+      unitsize = 1024 ** i
+      if size < (unitsize * 1024 * 2)
+        return "#{(size / unitsize).floor}#{unit}"
+      end
+      i += 1
+    end
+  end
+end
 
 module Zucchini
   class Application < Sinatra::Base
@@ -15,12 +30,22 @@ module Zucchini
     end
 
     get '/' do
+      @params = params
       @package = Package.to_h
       @movies = []
       @config['application']['suffixes'].each do |suffix|
         Dir.glob(File.join(ROOT_DIR, "public/movie/*#{suffix}")).each do |f|
-          f.sub!(File.join(ROOT_DIR, 'public'), '')
-          @movies.push(f)
+          next if (params['q'].present? && !File.basename(f).include?(params['q']))
+          movie = FFMPEG::Movie.new(f)
+          @movies.push({
+            size: File.binary_size(f),
+            name: File.basename(f),
+            href: f.sub(File.join(ROOT_DIR, 'public'), ''),
+            path: f,
+            width: movie.width,
+            height: movie.height,
+            duration: movie.duration,
+          })
         end
       end
       erb :index
@@ -28,7 +53,7 @@ module Zucchini
 
     not_found do
       status 404
-      "Not found."
+      'Not found.'
     end
 
     error do

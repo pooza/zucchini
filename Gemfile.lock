@@ -6,19 +6,14 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
-    addressable (2.5.2)
-      public_suffix (>= 2.0.2, < 4.0)
     concurrent-ruby (1.0.5)
     daemons (1.2.6)
     eventmachine (1.2.5)
-    httparty (0.16.2)
-      multi_xml (>= 0.5.2)
     i18n (1.0.0)
       concurrent-ruby (~> 1.0)
     minitest (5.11.3)
-    multi_xml (0.6.0)
+    multi_json (1.13.1)
     mustermann (1.0.2)
-    public_suffix (3.0.2)
     rack (2.0.4)
     rack-protection (2.0.1)
       rack
@@ -28,7 +23,8 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.1)
       tilt (~> 2.0)
-    syslog-logger (1.6.8)
+    streamio-ffmpeg (3.0.2)
+      multi_json (~> 1.8)
     thin (1.7.2)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -43,12 +39,10 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
-  addressable
-  httparty
   rack
   rake
   sinatra
-  syslog-logger
+  streamio-ffmpeg
   thin
 
 BUNDLED WITH
