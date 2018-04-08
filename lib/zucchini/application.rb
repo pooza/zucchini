@@ -47,11 +47,9 @@ module Zucchini
       get route do
         @renderer.template_file = 'index.erb'
         movies = []
-        @config['local']['dirs'].each do |dir|
-          @config['application']['suffixes'].each do |suffix|
-            Dir.glob(File.join(dir, "*#{suffix}")).each do |f|
-              movies.push(f)
-            end
+        @config['application']['suffixes'].each do |suffix|
+          Dir.glob(File.join(@config['local']['dir'], "*#{suffix}")).each do |f|
+            movies.push(f)
           end
         end
         @renderer.vars['movies'] = movies
