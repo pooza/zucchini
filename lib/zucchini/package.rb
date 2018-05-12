@@ -15,15 +15,15 @@ module Zucchini
     end
 
     def self.full_name
-      return "#{self.name} #{self.version}"
+      return "#{name} #{version}"
     end
 
     def self.to_h
       return {
-        name: self.name,
-        version: self.version,
-        url: self.url,
-        full_name: self.full_name,
+        name: name,
+        version: version,
+        url: url,
+        full_name: full_name,
       }
     end
   end

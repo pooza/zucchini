@@ -7,14 +7,12 @@ require 'streamio-ffmpeg'
 require 'digest/sha1'
 
 class File
-  def self.binary_size (path)
+  def self.binary_size(path)
     size = File.size(path)
     i = 0
     ['', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'].each do |unit|
-      unitsize = 1024 ** i
-      if size < (unitsize * 1024 * 2)
-        return "#{(size / unitsize).floor.commaize}#{unit}"
-      end
+      unitsize = 1024**i
+      return "#{(size / unitsize).floor.commaize}#{unit}" if size < (unitsize * 1024 * 2)
       i += 1
     end
   end
@@ -22,7 +20,7 @@ end
 
 class Integer
   def commaize
-    return self.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+    return to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
   end
 end
 
@@ -47,7 +45,7 @@ module Zucchini
       @movies = []
       @config['application']['suffixes'].each do |suffix|
         Dir.glob(File.join(ROOT_DIR, "public/movie/*#{suffix}")).each do |f|
-          next if (params['q'].present? && !File.basename(f).include?(params['q']))
+          next if params['q'].present? && !File.basename(f).include?(params['q'])
 
           movie = FFMPEG::Movie.new(f)
           digest = Digest::SHA1.hexdigest(File.read(f))
