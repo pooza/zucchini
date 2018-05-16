@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 gem 'activesupport'
-gem 'rack'
 gem 'rake'
 gem 'sinatra'
 gem 'streamio-ffmpeg'
